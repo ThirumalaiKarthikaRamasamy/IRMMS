@@ -1,0 +1,76 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="ISO-8859-1">
+<title>Insert title here</title>
+<style type="text/css">
+table {
+    border-collapse: collapse;
+}
+
+table, th, td {
+    border: 1px solid black;
+}
+thead {
+background-color:#5D758D; 
+color:white;
+}
+div, table{
+font-family:Candara;
+}
+</style>
+</head>
+<body>
+<div><b>Overdue Well Details</b></div>
+<div>
+#if($overdueLst1.size() > 0)
+<div><h4>Already overdue well details:</h4>
+<table cellpadding="5">
+<thead><tr><th>Well Name</th><th>Part No</th><th>Recommended<br> Maintenance Date</th><th>No 0f days overdue</th></tr></thead>
+<tbody>
+#foreach( $overdueDTO1 in $overdueLst1 )
+<tr>
+<td>$overdueDTO1.getWELL_NAME()</td>
+<td>$overdueDTO1.getPART_NO()</td>
+<td>$overdueDTO1.getNEXT_MAINTENANCE_DATE()</td>
+<td>$overdueDTO1.getDAYS()</td>
+</tr>
+#end
+</tbody>
+</table>
+</div>
+#end
+#if( $overdueLst2.size() > 0)
+<div id="today"><h4>The details of wells whose maintenance is due today:</h4>
+<table cellpadding="5">
+<thead><tr><th>Well Name</th><th>Part No</th></tr></thead>
+<tbody>
+#foreach( $overdueDTO2 in $overdueLst2 )
+<tr>
+<td>$overdueDTO2.getWELL_NAME()</td>
+<td>$overdueDTO2.getPART_NO()</td>
+</tr>
+#end
+</tbody>
+</table>
+</div>
+#end
+#if($overdueLst3.size() > 0)
+<div><h4>The details of wells whose maintenance is due in the next 3 days:</h4>
+<table cellpadding="5">
+<thead><tr><th>Well Name</th><th>Part No</th><th>Recommended<br> Maintenance Date</th></tr></thead>
+<tbody>
+#foreach( $overdueDTO3 in $overdueLst3 )
+<tr>
+<td>$overdueDTO3.getWELL_NAME()</td>
+<td>$overdueDTO3.getPART_NO()</td>
+<td>$overdueDTO3.getNEXT_MAINTENANCE_DATE()</td>
+</tr>
+#end
+</tbody>
+</table>
+</div>
+#end
+</div>
+</body>
+</html>

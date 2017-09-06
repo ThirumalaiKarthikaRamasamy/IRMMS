@@ -1,0 +1,6 @@
+@CHARSET "ISO-8859-1";
+
+html{height: 100%;}
+.header{postion:absolute;left:100px;background-color: blue;}
+
+.container{position:absolute;}

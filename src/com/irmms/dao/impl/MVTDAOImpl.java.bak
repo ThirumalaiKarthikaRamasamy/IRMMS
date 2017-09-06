@@ -1,0 +1,188 @@
+package com.ge.energy.mvtapp.dao.impl;
+
+import java.util.ArrayList;
+import java.util.List;
+
+import javax.sql.DataSource;
+
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.jdbc.core.JdbcTemplate;
+import org.springframework.stereotype.Service;
+
+import com.ge.energy.mvtapp.dao.MVTDAOIntf;
+import com.ge.energy.mvtapp.dao.mapper.IBStateMapper;
+import com.ge.energy.mvtapp.dao.mapper.IBWellMapper;
+import com.ge.energy.mvtapp.dao.mapper.IBWellPartsMapper;
+import com.ge.energy.mvtapp.dto.IBStateDTO;
+import com.ge.energy.mvtapp.dto.IBWellDTO;
+import com.ge.energy.mvtapp.dto.IBWellPartsDTO;
+import com.ge.energy.mvtapp.exception.MVTException;
+import com.ge.energy.mvtapp.logger.MVTLogger;
+
+@Service("mvtDAO")
+public class MVTDAOImpl implements MVTDAOIntf {
+
+	@Autowired
+	JdbcTemplate jdbcTemplate;
+	private MVTLogger logger = MVTLogger.getLogger(this.getClass());
+
+	DataSource dataSource;
+
+	/**
+	 * @return the jdbcTemplate
+	 */
+	public JdbcTemplate getJdbcTemplate() {
+		return jdbcTemplate;
+	}
+
+	/**
+	 * @param jdbcTemplate
+	 *            the jdbcTemplate to set
+	 */
+	public void setJdbcTemplate(JdbcTemplate jdbcTemplate) {
+		this.jdbcTemplate = jdbcTemplate;
+	}
+
+	/**
+	 * @return the dataSource
+	 */
+	public DataSource getDataSource() {
+		return dataSource;
+	}
+
+	/**
+	 * @param dataSource
+	 *            the dataSource to set
+	 */
+	public void setDataSource(DataSource dataSource) {
+		this.dataSource = dataSource;
+		this.jdbcTemplate = new JdbcTemplate(dataSource);
+	}
+	
+	@Override
+	public List getStateData(){
+		logger.info("getStateData  start in DAO ");
+		List<IBStateDTO> lstAISData = new ArrayList<IBStateDTO>();
+		
+		String stateCountQuery = "select state as STATE_NAME, count(distinct geo_api) as NO_OF_WELLS, avg(LATITUDE) as Latitude, avg(longitude) as LONGITUDE from spuds1 group by state";
+		
+		try {
+			lstAISData = getJdbcTemplate().query(stateCountQuery,
+			new IBStateMapper());
+		} catch (Exception e) {
+			logger.error(e.getLocalizedMessage(), e);
+			throw new MVTException(stateCountQuery, e.getMessage(), e);
+		}
+
+		logger.info("getStateData Query --- " + stateCountQuery);
+		return lstAISData;
+		
+	}
+
+	/*@Override
+	public List<IBWellDTO> getWellData() {
+		logger.info("getWellData  start in DAO ");
+		
+		List<IBWellDTO> lstWellData = new ArrayList<IBWellDTO>();
+		
+		IBWellDTO well;
+		
+		well = new IBWellDTO();
+		
+		well.setWell_id("1");
+		well.setCustomer_name("MAERSK OIL QATAR AS");
+		well.setWell_name("EA-02");
+		well.setField("North Field");
+		well.setBlock_no("12");
+		well.setLatitude("26.192249");
+		well.setLongitude("51.883303");
+		well.setMaintenance_status("R");
+		
+		lstWellData.add(well);
+		
+		well = new IBWellDTO();
+		
+		well.setWell_id("2");
+		well.setCustomer_name("MAERSK OIL QATAR AS");
+		well.setWell_name("EA-07");
+		well.setField("North Field");
+		well.setBlock_no("12");
+		well.setLatitude("26.247688");
+		well.setLongitude("51.905276");
+		well.setMaintenance_status("G");
+		
+		lstWellData.add(well);
+		
+		well = new IBWellDTO();
+		
+		well.setWell_id("3");
+		well.setCustomer_name("MAERSK OIL QATAR AS");
+		well.setWell_name("EA-08");
+		well.setField("North Field");
+		well.setBlock_no("12");
+		well.setLatitude("26.316642");
+		well.setLongitude("51.956088");
+		well.setMaintenance_status("Y");
+		
+		lstWellData.add(well);
+		
+		return lstWellData;
+	}*/
+	
+	
+	@Override
+	public List<IBWellDTO> getWellData() {
+		logger.info("getWellData  start in DAO ");
+		
+		List<IBWellDTO> lstWellData = new ArrayList<IBWellDTO>();
+		
+		String welldataQuery = "select Well_Data.WELL_ID as WELL_ID,Well_Data.CUSTOMER_NAME as CUSTOMER_NAME,Well_Data.WELL_NAME as WELL_NAME,Well_Data.FIELD as FIELD,Well_Data.BLOCK_NO as BLOCK_NO," +
+				"Well_Data.LATITUDE as LATITUDE,Well_Data.LONGITUDE as LONGITUDE,Well_Color.mstatus as mstatus from (select distinct WELL_ID,CUSTOMER_NAME,WELL_NAME,FIELD," +
+				"BLOCK_NO,LATITUDE,LONGITUDE from TABLEAU_POC.IB_QATAR_OIL_WELLS_DTL) Well_Data, (select WELL_ID, CASE " +
+				"WHEN daterange <0 THEN 'G' " +
+				"WHEN daterange<=30 THEN 'Y' " +
+				"ELSE 'R' END as mstatus from (select WELL_ID,trunc( sysdate - to_date(min(next_maintenance_date),'dd-MON-YY')) " +
+				"as daterange from TABLEAU_POC.IB_QATAR_OIL_WELLS_DTL group by WELL_ID)) Well_Color where Well_Data.WELL_ID =  Well_Color.WELL_ID ";
+				
+		
+		try {
+			lstWellData = getJdbcTemplate().query(welldataQuery,
+			new IBWellMapper());
+		} catch (Exception e) {
+			logger.error(e.getLocalizedMessage(), e);
+			throw new MVTException(welldataQuery, e.getMessage(), e);
+		}
+
+		logger.info("getWellData Query --- " + welldataQuery);
+		return lstWellData;		
+		
+	}
+	
+	
+	@Override
+	public List<IBWellPartsDTO> getWellPartsData(String well_id) {
+		logger.info("getWellPartsData  start in DAO ");
+		
+		List<IBWellPartsDTO> lstWellData = new ArrayList<IBWellPartsDTO>();
+		
+		String wellpartsdataQuery = "select part_no,serial_no,product_description,pms_description,CASE "
+			+"WHEN (sysdate - to_date(next_maintenance_date,'dd-MON-YY')) <0 THEN 'G' " +
+					"WHEN (sysdate - to_date(next_maintenance_date,'dd-MON-YY'))<=30 THEN 'Y' " +
+					"ELSE 'R' END as mstatus from TABLEAU_POC.IB_QATAR_OIL_WELLS_DTL where well_id='"+well_id+"'";
+				
+		
+		try {
+			lstWellData = getJdbcTemplate().query(wellpartsdataQuery,
+			new IBWellPartsMapper());
+		} catch (Exception e) {
+			logger.error(e.getLocalizedMessage(), e);
+			throw new MVTException(wellpartsdataQuery, e.getMessage(), e);
+		}
+
+		logger.info("getWellPartsData Query --- " + wellpartsdataQuery);
+		return lstWellData;		
+		
+	}
+	
+	
+	}

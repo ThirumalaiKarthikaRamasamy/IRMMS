@@ -1,0 +1,167 @@
+
+ <!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN" "http://www.w3.org/TR/html4/loose.dtd">
+<html>
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=ISO-8859-1">
+<title>IRMMS</title>
+    <script src="https://maps.googleapis.com/maps/api/js"></script>
+    <script src="js/jquery.min.js"></script>
+     <script src="http://code.jquery.com/jquery-1.10.2.js"></script>
+     <script src="js/jquery-form.js"></script>
+    <script src="js/map.js"></script>
+    <script src="js/infobubble.js"></script>
+    <script src="js/Label.js"></script>
+    <link href="css/index.css" rel="stylesheet">
+     <!-- <link href="css/bootstrap.min.css" rel="stylesheet"> -->
+     <link rel="stylesheet" href="http://code.jquery.com/ui/1.10.3/themes/smoothness/jquery-ui.css" />
+    <script src="http://code.jquery.com/ui/1.9.2/jquery-ui.js"></script>
+  </head>
+</head>
+<body onload="getOverdue()">
+<div class="overlay"></div>
+
+<div class="lightBox">
+		<div class="lightBoxTitle">
+			<b>Alert</b> 
+			<!-- <span class="closePop">X</span> -->
+			<span  class="cancelSave">X</span>
+		</div>
+		<div class="videoPlace">
+			<div id="alertMsg"><b></b></div>
+			&nbsp;&nbsp;&nbsp;&nbsp;<div class="btn btn-info closePop okButton">OK</div>
+			<!-- <div class="btn btn-info closePop okCompleteButton">OK</div> -->
+			<br>
+			<button class="btn btn-info saveData">YES</button>&nbsp;&nbsp;
+			<button class="btn btn-info cancelSave">NO</button>
+		</div>
+</div>
+
+<div class="lightBox1">
+		<div class="lightBoxTitle1">
+			<b>Alert</b> 
+			<!-- <span class="closePop">X</span> -->
+			<span class="cancelSave1">X</span>
+		</div>
+		<div class="videoPlace1">
+			<div id="alertMsg1"><b></b></div>
+			&nbsp;&nbsp;&nbsp;&nbsp;<div class="btn btn-info closePop1 okButton1">OK</div>
+			<!-- <div class="btn btn-info closePop okCompleteButton">OK</div> -->
+			<br>
+			<button class="btn btn-info saveData1">YES</button>&nbsp;&nbsp;
+			<button class="btn btn-info cancelSave1">NO</button>
+		</div>
+</div>
+	
+<div class="loading">
+	<div class="msg">Please wait..</div>
+	<img class="" src="images/ajax_loader.gif">
+</div>
+	<div class="main">
+		<div class="header_menu">
+			<div class="header_menu_section">
+			<ul class="firstUl">
+				<li id="header_menu_li" style="padding:0px;"><b style="font-size:18px;">IRMMS</b></li>
+				<li id="header_menu_li" style="border-color:#47BDDA;">Integrated Rig Maintenance Management System</li>
+			</ul>
+			</div>
+			<div class="header_menu_sections">
+			<ul>
+				<li id="header_menu_li"><img src="images/search.png"></li>
+				<li id="header_menu_li_text">
+				<span class="search" onclick = "search(); return false;">Search</span>
+				<img id="Pointingarrow" src="images/Pointing_arrow_img.png" style="display: none; padding-left: 59px;padding-top:0px;margin-top:-50px;">
+				</li>
+        		</ul>
+			</div>
+			<div class="header_menu_sections">
+			<ul>
+				<li id="header_menu_li"><img src="images/import.png"></li>
+				<li id="header_menu_li_text">
+				<span class="import" onclick="importTab();return false;">Import</span>
+				<img id="Pointingarrow1" src="images/Pointing_arrow_img.png" style="display: none; padding-left: 59px;padding-top:0px;margin-top:-50px;">
+				</li>
+			</ul>
+			</div> 
+			<div class="header_menu_sections">
+			<ul>
+				<li id="header_menu_li"><img src="images/export.png"></li>
+				<li id="header_menu_li_text">
+				<span class="export"><a href="./services/mvtapp/getexportwell" target="_blank">Export</a></span>
+				</li>
+			</ul>
+			</div>
+			<div class="header_menu_sections">
+			<ul>
+				<li id="header_menu_li"><img src="images/help.png"></li>
+				<li id="header_menu_li_text" style="padding-left:22px;">
+				<span class="help"><a href="images/IRMMS.PDF" target="_blank">Help</a></span>
+				</li>
+			</ul>
+			</div>
+		</div>
+		<div class="searchTab" style="display:none;">
+		
+		<img src="images/search2.png" style="padding-left: 36px;padding-top: 45px;">
+		<img onclick="searchClose();return false;" src="images/close_btn.png" style="padding-left: 125px;">
+		
+					<h3 style="color:#ffffff;font-family:sans-serif;margin-left: 28px;padding-left:53px;margin-top:-38px;">
+					Search Well</h3>
+					<form>
+						<select class="searchInpSelect customerName" id="customerDropDown">
+						</select>
+						<input type="text" class="searchInp wellName" placeHolder="Well Name"/>
+						<input type="text" class="searchInp partNo" placeHolder="Part Number"/>
+						<input type="text" class="searchInp serialNo" placeHolder="Serial Number"/>
+						<select class="searchInpSelect maintenanceDate">
+							<option value="0">Maintenance Date</option>
+									<option value="overdue">Overdue</option>
+									<option value="less1"> &lt; 1 Month </option>
+									<option value="grtr1">&gt; 1 Month</option>
+								<option value="dtNA"> Date NA</option>
+						</select>
+						<div class="buttonSearch">
+							<button id="searchBtn" onclick="searchBtnClick();return false;">Search</button>
+							<button type="reset" id="resetBtn" value="Reset">Reset</button>
+					
+						</div>
+					</form>	
+		</div>
+		<div class="importTab" style="display:none;">
+		<img src="images/import.png" style="padding-left:26px;padding-top: 45px;">
+		<img onclick="importClose();return false;" src="images/close_btn.png" style="padding-left: 125px;">
+		<h3 style="color:#ffffff;font-family:sans-serif;margin-left: 28px; padding-left:48px;margin-top:-29px;">Import</h3>
+		<div class="importDiv">
+		<ul class="importAccordian">
+		<li id="0" class="wellData">Well Data</li>
+		</ul>
+		</div><br/>
+		<div class="importMemuData">
+			<div class="x0">
+			<div class="wellDataMenu">
+			<img src='images/upload.png'>
+			<div>
+				<a href="./services/mvtapp/downloadTemplate"><button class="download">Download Template</button></a>
+			<div style="clear:both"></div>
+			<form id="myForm" action="services/mvtapp/uploadFile" method="post" enctype="multipart/form-data">
+	    		<input  id="Data_file" type="file"  name="uploadedFile" size="50" accept=".xlsx" />
+	   			<input class="upload" type="submit" value="Upload" />
+			</form>
+			</div>
+			</div>	
+			</div>
+		</div>
+		</div>
+		<div class="legend">
+              <div class="lowerLeft"><h3><strong>Legend <span class="controlUp"></span> </strong></h3>
+                     <ul class="legendUl">
+                           <li class="lialign"><span class="imgContainer"><img src="images/R.png"></span><label class="labelalign"><span>- Overdue</span></label></li>
+                           <li class="lialign"><span class="imgContainer"><img src="images/Y.png"></span><label class="labelalign"><span>- &lt; One Month</span></label></li>
+                           <li class="lialign"><span class="imgContainer"><img src=" images/G.png"></span><label class="labelalign"><span>- &gt; One Month</span></label></li>
+                           <li class="lialign"><span class="imgContainer"><img src=" images/GR.png"></span><label class="labelalign"><span>- Date N/A</span></label></li>
+                     </ul>
+              </div>
+        </div>	
+		<div id="map-canvas"></div>
+	</div>
+</body>
+</html>
